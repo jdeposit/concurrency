@@ -1,3 +1,8 @@
+/**
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 package jdep.concurrency;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -24,6 +29,10 @@ public class Once<T> {
         return v.get();
     }
 
+    /**
+     * This inner class is needed to be able to differentiate {@code null} value from not setup value yet.
+     * @param <T>
+     */
     private class Value<T> {
         private final T value;
 
@@ -34,7 +43,6 @@ public class Once<T> {
         public T get() {
             return value;
         }
-
     }
 
 }
