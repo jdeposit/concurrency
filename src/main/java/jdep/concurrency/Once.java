@@ -1,4 +1,4 @@
-package concurrency;
+package jdep.concurrency;
 
 import java.util.concurrent.atomic.AtomicReference;
 
