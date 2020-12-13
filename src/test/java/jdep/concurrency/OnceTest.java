@@ -8,6 +8,7 @@ package jdep.concurrency;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class OnceTest {
@@ -25,14 +26,32 @@ public class OnceTest {
     @Test
     public void testConcurrency() {
         Once<Integer> once = new Once<>();
+        CountDownLatch counterOnStart = new CountDownLatch(1);
+        CountDownLatch counterOnFinish = new CountDownLatch(2);
         AtomicBoolean firstSet = new AtomicBoolean();
         new Thread(() -> {
+            await(counterOnStart);
             firstSet.compareAndSet(false, once.set(1));
+            counterOnFinish.countDown();
         }).start();
         new Thread(() -> {
+            await(counterOnStart);
             once.set(2);
+            counterOnFinish.countDown();
         }).start();
-        Integer expectingResult = firstSet.get() ? 1: 2;
+        counterOnStart.countDown();
+        await(counterOnFinish);
+
+        Integer expectingResult = firstSet.get() ? 1 : 2;
         Assert.assertEquals(expectingResult, once.get());
     }
+
+    private void await(CountDownLatch counter) {
+        try {
+            counter.await();
+        } catch (InterruptedException e) {
+            throw new IllegalStateException();
+        }
+    }
+
 }
